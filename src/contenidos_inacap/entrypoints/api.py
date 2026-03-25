@@ -16,11 +16,11 @@ SERVICE_NAME = cfg.get("project", {}).get("name", "content-grading-service")
 
 app = FastAPI(title=SERVICE_NAME, version="0.1.0")
 
-
 # CORS
 origins = [
     "http://localhost:4200",
     "http://127.0.0.1:4200",
+    "https://d1l01nx5bjijft.cloudfront.net",
 ]
 
 app.add_middleware(
@@ -31,12 +31,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 # routers
 app.include_router(materials_router)
 app.include_router(evaluations_router)
 
-
 @app.get("/health")
 def health():
     return {"status": "ok", "service": SERVICE_NAME}
+
