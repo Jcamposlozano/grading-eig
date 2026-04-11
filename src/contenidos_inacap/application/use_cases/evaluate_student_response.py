@@ -1,7 +1,13 @@
 from __future__ import annotations
 
 import json
+import os
 
+from contenidos_inacap.adapters.canvas.canvas_client import (
+    CanvasApiError,
+    CanvasNotConfiguredError,
+    update_submission_grade,
+)
 from contenidos_inacap.application.dto.evaluation_dto import (
     EvaluationRequestDTO,
     EvaluationResponseDTO,
@@ -50,8 +56,40 @@ class EvaluateStudentResponseUseCase:
 
         result = self.llm_evaluator.evaluate(prompt=prompt)
         result.prompt_used = prompt_template
-        #print("Finish ->", result)
+        
+        # Upload to Canvas if Canvas parameters are provided
+        if (
+            request.canvas_course_id
+            and request.canvas_assignment_id
+            and request.canvas_user_id
+        ):
+            self._upload_to_canvas(request, result)
+        
         return result
+
+    def _upload_to_canvas(self, request: EvaluationRequestDTO, result: EvaluationResponseDTO) -> None:
+        """Upload evaluation results to Canvas."""
+        canvas_base_url = os.getenv("CANVAS_BASE_URL")
+        canvas_token = os.getenv("CANVAS_ACCESS_TOKEN")
+        
+        if not canvas_base_url or not canvas_token:
+            raise CanvasNotConfiguredError(
+                "CANVAS_BASE_URL y CANVAS_ACCESS_TOKEN deben estar configurados para subir a Canvas"
+            )
+        
+        try:
+            update_submission_grade(
+                base_url=canvas_base_url,
+                token=canvas_token,
+                course_id=request.canvas_course_id,
+                assignment_id=request.canvas_assignment_id,
+                user_id=request.canvas_user_id,
+                score=result.total_score,
+                comment=result.general_feedback,
+            )
+        except CanvasApiError as exc:
+            # Log the error but don't fail the evaluation
+            print(f"Error subiendo a Canvas: {exc}")
 
     def _build_prompt(
         self,
