@@ -44,6 +44,9 @@ class EvaluationRequestDTO(BaseModel):
     material_id: str
     rubric: RubricDTO
     prompt_template: Optional[str] = None
+    canvas_course_id: Optional[str] = None
+    canvas_assignment_id: Optional[str] = None
+    canvas_user_id: Optional[str] = None
 
 
 class CriterionEvaluationResultDTO(BaseModel):
