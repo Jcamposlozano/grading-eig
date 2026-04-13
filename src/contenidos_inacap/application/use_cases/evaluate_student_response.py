@@ -58,6 +58,12 @@ class EvaluateStudentResponseUseCase:
         result.prompt_used = prompt_template
         
         # Upload to Canvas if Canvas parameters are provided
+
+        #print('Fin calificacion')
+        #print(request.canvas_course_id,
+        #    request.canvas_assignment_id,
+        #    request.canvas_user_id)
+        
         if (
             request.canvas_course_id
             and request.canvas_assignment_id
@@ -78,6 +84,8 @@ class EvaluateStudentResponseUseCase:
             )
         
         try:
+            print('Aftther update in Canvas')
+            print(result.general_feedback)
             update_submission_grade(
                 base_url=canvas_base_url,
                 token=canvas_token,
