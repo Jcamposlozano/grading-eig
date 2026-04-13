@@ -2,6 +2,14 @@ from __future__ import annotations
 
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile, status
 
+from contenidos_inacap.adapters.canvas.canvas_client import (
+    CanvasApiError,
+    CanvasNotConfiguredError,
+)
+from contenidos_inacap.application.dto.canvas_import_dto import (
+    ImportFromCanvasAssignmentRequest,
+    ImportFromCanvasRequest,
+)
 from contenidos_inacap.application.dto.extract_text_dto import ExtractTextResponse
 from contenidos_inacap.application.dto.material_dto import UploadMaterialResponse
 from contenidos_inacap.application.use_cases.extract_text import (
@@ -16,6 +24,7 @@ from contenidos_inacap.application.use_cases.upload_material import (
 )
 from contenidos_inacap.shared.container import (
     get_extract_text_use_case,
+    get_import_material_from_canvas_use_case,
     get_upload_material_use_case,
 )
 
@@ -63,6 +72,95 @@ async def upload_material(
         ) from exc
     finally:
         await file.close()
+
+
+@router.post(
+    "/from-canvas",
+    response_model=UploadMaterialResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def import_from_canvas(body: ImportFromCanvasRequest):
+    """Descarga un archivo desde Canvas (API) y lo registra como material."""
+    try:
+        use_case = get_import_material_from_canvas_use_case()
+        material = use_case.execute(file_id=body.file_id.strip())
+        return UploadMaterialResponse(
+            material_id=material.id,
+            original_filename=material.original_filename,
+            stored_filename=material.filename,
+            media_type=material.media_type,
+            mime_type=material.mime_type,
+            file_size=material.file_size,
+            status=material.status,
+            created_at=material.created_at,
+        )
+    except CanvasNotConfiguredError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=str(exc),
+        ) from exc
+    except CanvasApiError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=str(exc),
+        ) from exc
+    except UnsupportedFileTypeError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
+    except EmptyFileError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
+
+
+@router.post(
+    "/from-canvas-assignment",
+    response_model=UploadMaterialResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def import_from_canvas_assignment(body: ImportFromCanvasAssignmentRequest):
+    """Descarga el archivo de la entrega de una tarea (curso + assignment + usuario). No hace falta file_id."""
+    try:
+        use_case = get_import_material_from_canvas_use_case()
+        material = use_case.execute_from_assignment(
+            course_id=body.course_id.strip(),
+            assignment_id=body.assignment_id.strip(),
+            user_id=body.user_id.strip(),
+            attachment_index=body.attachment_index,
+        )
+        return UploadMaterialResponse(
+            material_id=material.id,
+            original_filename=material.original_filename,
+            stored_filename=material.filename,
+            media_type=material.media_type,
+            mime_type=material.mime_type,
+            file_size=material.file_size,
+            status=material.status,
+            created_at=material.created_at,
+        )
+    except CanvasNotConfiguredError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=str(exc),
+        ) from exc
+    except CanvasApiError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=str(exc),
+        ) from exc
+    except UnsupportedFileTypeError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
+    except EmptyFileError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
 
 
 @router.post(

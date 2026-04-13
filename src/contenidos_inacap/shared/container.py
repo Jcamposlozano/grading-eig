@@ -8,6 +8,9 @@ from contenidos_inacap.adapters.repositories.in_memory_material_repository impor
 from contenidos_inacap.adapters.storage.local_file_storage import LocalFileStorage
 from contenidos_inacap.adapters.transcription.openai_transcriber import OpenAITranscriber
 from contenidos_inacap.application.use_cases.extract_text import ExtractTextUseCase
+from contenidos_inacap.application.use_cases.import_material_from_canvas import (
+    ImportMaterialFromCanvasUseCase,
+)
 from contenidos_inacap.application.use_cases.upload_material import UploadMaterialUseCase
 from contenidos_inacap.shared.config import load_config
 
@@ -28,6 +31,12 @@ def get_upload_material_use_case() -> UploadMaterialUseCase:
     return UploadMaterialUseCase(
         material_repository=_material_repository,
         file_storage=_file_storage,
+    )
+
+
+def get_import_material_from_canvas_use_case() -> ImportMaterialFromCanvasUseCase:
+    return ImportMaterialFromCanvasUseCase(
+        upload_material=get_upload_material_use_case(),
     )
 
 

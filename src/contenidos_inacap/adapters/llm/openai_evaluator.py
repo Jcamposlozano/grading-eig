@@ -35,7 +35,7 @@ class OpenAIEvaluator(LLMEvaluatorPort):
 
         return EvaluationResponseDTO(
             criteria_results=payload["criteria_results"],
-            total_score=payload["total_score"],
+            total_score=None,
             general_feedback=payload["general_feedback"],
             prompt_used="",
         )

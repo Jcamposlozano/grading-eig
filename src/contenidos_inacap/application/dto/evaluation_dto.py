@@ -44,18 +44,21 @@ class EvaluationRequestDTO(BaseModel):
     material_id: str
     rubric: RubricDTO
     prompt_template: Optional[str] = None
+    canvas_course_id: Optional[str] = None
+    canvas_assignment_id: Optional[str] = None
+    canvas_user_id: Optional[str] = None
 
 
-class CriterionEvaluationResultDTO(BaseModel):
+class CriterionEvaluationResult(BaseModel):
     criterion_id: str
     criterion_name: str
     selected_level: str
-    score: int
+    score: int | None = None
     justification: str
 
 
 class EvaluationResponseDTO(BaseModel):
-    criteria_results: List[CriterionEvaluationResultDTO]
-    total_score: int
+    criteria_results: list[CriterionEvaluationResult]
+    total_score: int | None = None
     general_feedback: str
-    prompt_used: str
+    prompt_used: str | None = None
