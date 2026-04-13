@@ -49,16 +49,16 @@ class EvaluationRequestDTO(BaseModel):
     canvas_user_id: Optional[str] = None
 
 
-class CriterionEvaluationResultDTO(BaseModel):
+class CriterionEvaluationResult(BaseModel):
     criterion_id: str
     criterion_name: str
     selected_level: str
-    score: int
+    score: int | None = None
     justification: str
 
 
 class EvaluationResponseDTO(BaseModel):
-    criteria_results: List[CriterionEvaluationResultDTO]
-    total_score: int
+    criteria_results: list[CriterionEvaluationResult]
+    total_score: int | None = None
     general_feedback: str
-    prompt_used: str
+    prompt_used: str | None = None

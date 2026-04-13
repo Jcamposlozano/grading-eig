@@ -66,6 +66,7 @@ class ImportMaterialFromCanvasUseCase:
             assignment_id=assignment_id,
             user_id=user_id,
         )
+        #print(submission)
         file_id, att = _attachment_from_submission(submission, attachment_index)
         hint = att.get("display_name") or att.get("filename")
         return self.execute(
