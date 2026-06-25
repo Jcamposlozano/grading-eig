@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(poetry install:*)",
+      "Bash(poetry run:*)",
+      "Bash(poetry lock:*)",
+      "Bash(make install:*)",
+      "Bash(make run-api:*)",
+      "Bash(make run-worker:*)",
+      "Bash(make format:*)",
+      "Bash(make lint:*)",
+      "Bash(make precommit:*)",
+      "Bash(ruff:*)",
+      "Bash(black:*)",
+      "Bash(pytest:*)",
+      "Bash(mypy:*)",
+      "Bash(pre-commit:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git branch:*)",
+      "Bash(git show:*)"
+    ],
+    "ask": [
+      "Bash(poetry add:*)",
+      "Bash(poetry remove:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git reset:*)",
+      "Bash(docker:*)",
+      "Bash(docker compose:*)",
+      "Bash(aws:*)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Bash(cat .env)",
+      "Bash(rm -rf:*)"
+    ]
+  }
+}
