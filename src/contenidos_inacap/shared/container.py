@@ -21,6 +21,7 @@ from contenidos_inacap.application.use_cases.import_material_from_canvas import 
 )
 from contenidos_inacap.application.use_cases.upload_material import UploadMaterialUseCase
 from contenidos_inacap.ports.credentials_port import CredentialsPort
+from contenidos_inacap.ports.queue_port import QueuePort
 from contenidos_inacap.ports.rubric_port import RubricPort
 from contenidos_inacap.ports.storage_port import StoragePort
 from contenidos_inacap.shared.config import load_config
@@ -76,6 +77,30 @@ def _build_credentials() -> CredentialsPort:
 
 _credentials = _build_credentials()
 _canvas_adapter_factory = CanvasAdapterFactory(_credentials)
+
+
+def _build_queue() -> QueuePort:
+    queue_cfg = _config.get("queue", {})
+    backend = queue_cfg.get("backend", "memory")
+    if backend == "sqs":
+        # Import diferido: boto3 solo es necesario con SQS.
+        from contenidos_inacap.adapters.queue.sqs_queue import SqsQueue
+
+        return SqsQueue(
+            queue_url=queue_cfg["url"],
+            region=_config.get("storage", {}).get("region"),
+        )
+
+    from contenidos_inacap.adapters.queue.in_memory_queue import InMemoryQueue
+
+    return InMemoryQueue()
+
+
+_queue = _build_queue()
+
+
+def get_queue() -> QueuePort:
+    return _queue
 
 
 def get_credentials() -> CredentialsPort:

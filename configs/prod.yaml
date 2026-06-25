@@ -7,3 +7,5 @@ storage:
   backend: s3
 credentials:
   backend: secrets_manager
+queue:
+  backend: sqs

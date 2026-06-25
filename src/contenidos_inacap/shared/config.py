@@ -49,6 +49,7 @@ def load_config(config_dir: str = "configs") -> dict[str, Any]:
     cfg.setdefault("worker", {})
     cfg.setdefault("storage", {})
     cfg.setdefault("credentials", {})
+    cfg.setdefault("queue", {})
 
     cfg["project"]["env"] = os.getenv("ENV", cfg["project"].get("env", "dev"))
     cfg["project"]["log_level"] = os.getenv("LOG_LEVEL", cfg["project"].get("log_level", "INFO"))
@@ -73,6 +74,15 @@ def load_config(config_dir: str = "configs") -> dict[str, Any]:
     )
     cfg["credentials"]["secret_prefix"] = os.getenv(
         "CANVAS_SECRET_PREFIX", cfg["credentials"].get("secret_prefix", "prisma/grading")
+    )
+
+    cfg["queue"]["backend"] = os.getenv("QUEUE_BACKEND", cfg["queue"].get("backend", "memory"))
+    cfg["queue"]["url"] = os.getenv("SQS_QUEUE_URL", cfg["queue"].get("url"))
+    cfg["queue"]["wait_seconds"] = int(
+        os.getenv("QUEUE_WAIT_SECONDS", cfg["queue"].get("wait_seconds", 20))
+    )
+    cfg["queue"]["max_messages"] = int(
+        os.getenv("QUEUE_MAX_MESSAGES", cfg["queue"].get("max_messages", 5))
     )
 
     return cfg

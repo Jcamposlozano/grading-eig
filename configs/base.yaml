@@ -20,3 +20,8 @@ storage:
 credentials:
   backend: env              # env | secrets_manager
   secret_prefix: prisma/grading
+
+queue:
+  backend: memory           # memory | sqs
+  wait_seconds: 20
+  max_messages: 5
