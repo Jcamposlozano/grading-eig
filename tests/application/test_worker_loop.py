@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from contenidos_inacap.entrypoints.worker import run_consume_loop
-from contenidos_inacap.ports.queue_port import QueueMessage
+from grading.entrypoints.worker import run_consume_loop
+from grading.ports.queue_port import QueueMessage
 
 
 class FakeShutdown:

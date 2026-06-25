@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from contenidos_inacap.domain.entities.actividad import Actividad
-from contenidos_inacap.domain.entities.calificacion import Calificacion, ResultadoCriterio
-from contenidos_inacap.domain.entities.curso import Curso
-from contenidos_inacap.domain.entities.entregable import Entregable
-from contenidos_inacap.domain.entities.estudiante import Estudiante
-from contenidos_inacap.domain.entities.rubrica import CriterioRubrica, NivelRubrica, Rubrica
-from contenidos_inacap.domain.entities.universidad import Universidad
-from contenidos_inacap.domain.enums import ClasificacionActividad, EstadoEntregable
+from grading.domain.entities.actividad import Actividad
+from grading.domain.entities.calificacion import Calificacion, ResultadoCriterio
+from grading.domain.entities.curso import Curso
+from grading.domain.entities.entregable import Entregable
+from grading.domain.entities.estudiante import Estudiante
+from grading.domain.entities.rubrica import CriterioRubrica, NivelRubrica, Rubrica
+from grading.domain.entities.universidad import Universidad
+from grading.domain.enums import ClasificacionActividad, EstadoEntregable
 
 
 def test_hierarchy_construction():

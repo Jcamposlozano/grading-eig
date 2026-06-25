@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from contenidos_inacap.application.dto.evaluation_dto import (
+from grading.application.dto.evaluation_dto import (
     CriterionEvaluationResult,
     EvaluationRequestDTO,
     EvaluationResponseDTO,
@@ -10,12 +10,12 @@ from contenidos_inacap.application.dto.evaluation_dto import (
     RubricDTO,
     RubricLevelDTO,
 )
-from contenidos_inacap.application.use_cases import evaluate_student_response as mod
-from contenidos_inacap.application.use_cases.evaluate_student_response import (
+from grading.application.use_cases import evaluate_student_response as mod
+from grading.application.use_cases.evaluate_student_response import (
     EvaluateStudentResponseUseCase,
 )
-from contenidos_inacap.domain.entities.material import Material, MaterialStatus, MaterialType
-from contenidos_inacap.ports.llm_evaluator_port import LLMEvaluatorPort
+from grading.domain.entities.material import Material, MaterialStatus, MaterialType
+from grading.ports.llm_evaluator_port import LLMEvaluatorPort
 
 
 def _material() -> Material:

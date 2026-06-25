@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from contenidos_inacap.application.dto.calificacion_dto import CalificacionRequestDTO
+from grading.application.dto.calificacion_dto import CalificacionRequestDTO
 
 
 def _valid() -> dict:

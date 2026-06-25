@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import pytest
 
-from contenidos_inacap.application.strategies.extraction import ExtractionStrategy
-from contenidos_inacap.application.use_cases.extract_text import (
+from grading.application.strategies.extraction import ExtractionStrategy
+from grading.application.use_cases.extract_text import (
     ExtractTextUseCase,
     UnsupportedExtractionTypeError,
 )
-from contenidos_inacap.domain.entities.material import Material, MaterialStatus, MaterialType
-from contenidos_inacap.domain.enums import ClasificacionActividad
+from grading.domain.entities.material import Material, MaterialStatus, MaterialType
+from grading.domain.enums import ClasificacionActividad
 
 
 def _material(media_type: MaterialType = MaterialType.DOCUMENT) -> Material:

@@ -2,23 +2,23 @@ from __future__ import annotations
 
 import pytest
 
-from contenidos_inacap.adapters.storage.local_object_storage import LocalObjectStorage
-from contenidos_inacap.application.dto.evaluation_dto import (
+from grading.adapters.storage.local_object_storage import LocalObjectStorage
+from grading.application.dto.evaluation_dto import (
     CriterionEvaluationResult,
     EvaluationResponseDTO,
     RubricCriterionDTO,
     RubricDTO,
     RubricLevelDTO,
 )
-from contenidos_inacap.application.services.rubric_grader import RubricGrader
-from contenidos_inacap.application.strategies.extraction import build_extraction_registry
-from contenidos_inacap.application.use_cases.calificar_entregable import (
+from grading.application.services.rubric_grader import RubricGrader
+from grading.application.strategies.extraction import build_extraction_registry
+from grading.application.use_cases.calificar_entregable import (
     CalificarEntregable,
     CalificarEntregableCommand,
     TipoEntregableNoSoportadoError,
 )
-from contenidos_inacap.ports.canvas_port import AttachmentRef
-from contenidos_inacap.shared import s3_keys
+from grading.ports.canvas_port import AttachmentRef
+from grading.shared import s3_keys
 
 RUBRIC = RubricDTO(
     rubric_name="R",

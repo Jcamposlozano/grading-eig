@@ -1,5 +1,5 @@
 project:
-  name: contenidos-inacap
+  name: grading
   env: dev
   log_level: INFO
 

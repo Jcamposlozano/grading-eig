@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pytest
 
-from contenidos_inacap.adapters.secrets.env_credentials import EnvCredentials
-from contenidos_inacap.ports.credentials_port import CredentialsResolutionError
+from grading.adapters.secrets.env_credentials import EnvCredentials
+from grading.ports.credentials_port import CredentialsResolutionError
 
 
 def test_reads_global_env_and_strips_trailing_slash(monkeypatch):

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from contenidos_inacap.domain.entities.material import MaterialType
-from contenidos_inacap.domain.media_type import media_type_from_filename, supported_extensions
+from grading.domain.entities.material import MaterialType
+from grading.domain.media_type import media_type_from_filename, supported_extensions
 
 
 def test_detects_by_extension_case_insensitive():

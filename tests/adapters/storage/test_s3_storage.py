@@ -6,7 +6,7 @@ pytest.importorskip("boto3")
 
 from botocore.exceptions import ClientError
 
-from contenidos_inacap.adapters.storage.s3_storage import S3Storage
+from grading.adapters.storage.s3_storage import S3Storage
 
 
 class _FakeBody:

@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "contenidos-inacap"
+name = "grading"
 version = "0.1.0"
-description = "Servicio ESIC para contenidos INACAP"
+description = "Servicio de calificación automática multi-universidad"
 authors = ["Jonathan Campos <you@example.com>"]
 readme = "README.md"
-packages = [{ include = "contenidos_inacap", from = "src" }]
+packages = [{ include = "grading", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.11"

@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import pytest
 
-from contenidos_inacap.adapters.rubric.s3_rubric_store import S3RubricStore
-from contenidos_inacap.adapters.storage.local_object_storage import LocalObjectStorage
-from contenidos_inacap.ports.rubric_port import RubricNotFoundError
-from contenidos_inacap.shared.s3_keys import rubrica_key
+from grading.adapters.rubric.s3_rubric_store import S3RubricStore
+from grading.adapters.storage.local_object_storage import LocalObjectStorage
+from grading.ports.rubric_port import RubricNotFoundError
+from grading.shared.s3_keys import rubrica_key
 
 RUBRIC = {
     "rubric_name": "Rúbrica demo",

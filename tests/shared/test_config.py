@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from contenidos_inacap.shared.config import load_config
+from grading.shared.config import load_config
 
 
 def test_universidades_permitidas_from_yaml(monkeypatch):

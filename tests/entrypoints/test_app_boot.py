@@ -19,7 +19,7 @@ pytest.importorskip("dotenv")
 
 from fastapi.testclient import TestClient
 
-from contenidos_inacap.entrypoints.api import app
+from grading.entrypoints.api import app
 
 
 def test_health_and_ready():

@@ -36,7 +36,7 @@ El repo **ya es hexagonal**. Mantener la separación de capas y la regla de depe
 ### Estructura de carpetas objetivo
 
 ```
-src/grading/                     # hoy `contenidos_inacap` (se renombra en paso tardío)
+src/grading/                     # paquete renombrado desde `contenidos_inacap`
   domain/entities/               # universidad, curso, estudiante, actividad, entregable, rubrica, calificacion
   domain/enums.py                # ClasificacionActividad, EstadoEntregable
   application/use_cases/         # CalificarEntregable (orquestador) + casos existentes

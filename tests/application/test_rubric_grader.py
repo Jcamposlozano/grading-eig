@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import pytest
 
-from contenidos_inacap.application.dto.evaluation_dto import (
+from grading.application.dto.evaluation_dto import (
     CriterionEvaluationResult,
     EvaluationResponseDTO,
     RubricCriterionDTO,
     RubricDTO,
     RubricLevelDTO,
 )
-from contenidos_inacap.application.services.rubric_grader import RubricGrader
+from grading.application.services.rubric_grader import RubricGrader
 
 
 class FakeLLM:

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from contenidos_inacap.adapters.queue.in_memory_queue import InMemoryQueue
+from grading.adapters.queue.in_memory_queue import InMemoryQueue
 
 
 def test_enqueue_then_consume_fifo():

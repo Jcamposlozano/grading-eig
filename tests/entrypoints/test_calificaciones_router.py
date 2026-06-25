@@ -8,10 +8,10 @@ pytest.importorskip("httpx")
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from contenidos_inacap.adapters.queue.in_memory_queue import InMemoryQueue
-from contenidos_inacap.adapters.storage.local_object_storage import LocalObjectStorage
-from contenidos_inacap.entrypoints.routers import calificaciones_router as mod
-from contenidos_inacap.shared import s3_keys
+from grading.adapters.queue.in_memory_queue import InMemoryQueue
+from grading.adapters.storage.local_object_storage import LocalObjectStorage
+from grading.entrypoints.routers import calificaciones_router as mod
+from grading.shared import s3_keys
 
 _ALL_UNIS = ["westfield", "eig", "esic", "uide"]
 

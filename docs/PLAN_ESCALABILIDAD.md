@@ -14,13 +14,13 @@
 | 4 | Credenciales Canvas por universidad | **AWS Secrets Manager** por `id_universidad(+env)`. |
 | 5 | Bucket | Único: `prisma-calificacion-canvas` (`us-east-2`), organizado por jerarquía. |
 | 6 | Clasificación de actividad | Decide la estrategia de extracción vía **registry** (no `if/elif`). |
-| 7 | Paquete | `contenidos_inacap` → `grading` (renombrado mecánico, paso tardío). |
+| 7 | Paquete | `grading` (renombrado desde `contenidos_inacap`, Paso 10). |
 
 ---
 
 ## 1. Mapa del estado actual (Fase 0)
 
-El repo **ya es hexagonal** (`src/contenidos_inacap/` → `domain/application/ports/adapters/entrypoints/shared`), Poetry, py311, FastAPI + Worker, Docker, ruff/black `line-length=100`, pre-commit. La migración *estructural* está casi hecha.
+El repo **ya es hexagonal** (`src/grading/` → `domain/application/ports/adapters/entrypoints/shared`), Poetry, py311, FastAPI + Worker, Docker, ruff/black `line-length=100`, pre-commit. La migración *estructural* está casi hecha.
 
 | Área | Estado hoy | Archivo(s) |
 |---|---|---|
@@ -89,7 +89,7 @@ Universidad ─┬─< Curso ─┬─< Estudiante
 ## 3. Estructura de carpetas objetivo + plan de migración del código
 
 ```
-src/grading/                     # hoy `contenidos_inacap` (renombrado en paso tardío)
+src/grading/                     # paquete renombrado desde `contenidos_inacap`
   domain/entities/               # universidad, curso, estudiante, actividad, entregable, rubrica, calificacion
   domain/enums.py                # ClasificacionActividad, EstadoEntregable
   application/use_cases/         # CalificarEntregable (orquestador) + casos existentes
@@ -292,7 +292,7 @@ Reutiliza los adaptadores actuales (`DocumentTextExtractor`, `FFmpegAudioExtract
 3. **¿BD?** ¿Los listados/consultas justifican DynamoDB, o S3-by-prefix basta esta fase?
 4. ~~**Migración bucket:** ¿qué objetos migramos?~~ **RESUELTO:** inspeccionado y migrado (Paso 8 aplicado) — rúbrica (útil) + calificaciones viejas como histórico `legacy_`; logs/audit descartados.
 5. ~~**`confidence`:** ¿hay umbral mínimo además del `publish` del LLM?~~ **RESUELTO:** `publish=true` → publica siempre; **sin umbral** de `confidence` (se guarda solo como metadato).
-6. **Renombrar paquete** `contenidos_inacap` → `grading`: ¿OK, o conservar el nombre?
+6. ~~**Renombrar paquete** `contenidos_inacap` → `grading`~~ **RESUELTO:** renombrado (Paso 10).
 7. **Rotación de secretos:** ¿automática (Secrets Manager) o manual?
 8. **Límite de video:** ¿tamaño/duración máximos a soportar (afecta timeouts/costos)?
 9. **`key-canvas`:** confirmar que el trigger **no** enviará el token (lo resolvemos nosotros).
@@ -313,7 +313,7 @@ Cada paso es **enviable y testeable** por separado; convive con lo viejo detrás
 - [x] **Paso 7 — Orquestador + endpoint.** `CalificarEntregable` (idempotente por S3: descarga→raw, extrae→extracted, rúbrica, califica, grading+metadata, publica si `publish`) + `POST /v1/calificaciones` (202, valida + encola) + GET calificación/rúbrica + `/health/ready`. Reutiliza `RubricGrader`/`feedback`/`media_type`. 66 tests verdes; boot real de la app verificado. *(Supuesto: id_curso/actividad/estudiante = ids de Canvas.)*
 - [x] **Paso 8 — Migración bucket (APLICADA).** `scripts/migrate_bucket.py` modo `eig` (curado, data-driven, idempotente, copy-only). **Ejecutado:** 9 objetos copiados a `prisma-calificacion-canvas` — rúbrica `rubrica.json` replicada bajo las 4 actividades con entregas (`prod/eig/2692/actividades/{30282,30300,30301,30302}/rubrica/`) + 5 calificaciones viejas como `…/grading/legacy_calificacion.json`. Descartados: 4 logs `raw/log_*`, `audit/test.txt`, placeholder. Bucket viejo intacto (12 objetos). Idempotencia verificada (re-`--apply` = 0 copias).
 - [x] **Paso 9 — Multi-uni por config.** Allowlist `universidades.permitidas` en `base.yaml` (acotable por `{env}.yaml` + override `UNIVERSIDADES_PERMITIDAS`, normalizada a slugs). `POST /v1/calificaciones` valida la universidad contra la allowlist (`400` si no está habilitada) vía `get_allowed_universidades`. Agregar una universidad = solo config. 79 tests verdes.
-- [ ] **Paso 10 — Renombrar paquete.** `contenidos_inacap` → `grading` (mecánico, un solo commit).
+- [x] **Paso 10 — Renombrar paquete.** `contenidos_inacap` → `grading` (`git mv` + reemplazo global de ambas formas en código/build/docs; `pyproject`/`Makefile`/`Dockerfile`/`docker-compose`/`base.yaml` actualizados). 0 referencias viejas; 79 tests verdes; app importa como `grading`.
 - [ ] **Paso 11 — Deprecación v1.** Retirar rutas de materiales una vez el orquestador las cubre.
 
 ### Anexo — El orquestador `CalificarEntregable` (Paso 7)

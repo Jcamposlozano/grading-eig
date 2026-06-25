@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from contenidos_inacap.adapters.storage.local_object_storage import LocalObjectStorage
+from grading.adapters.storage.local_object_storage import LocalObjectStorage
 
 
 def test_put_get_bytes_roundtrip(tmp_path):

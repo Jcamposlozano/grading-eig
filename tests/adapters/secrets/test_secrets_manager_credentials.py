@@ -4,10 +4,10 @@ import json
 
 import pytest
 
-from contenidos_inacap.adapters.secrets.secrets_manager_credentials import (
+from grading.adapters.secrets.secrets_manager_credentials import (
     SecretsManagerCredentials,
 )
-from contenidos_inacap.ports.credentials_port import CredentialsResolutionError
+from grading.ports.credentials_port import CredentialsResolutionError
 
 
 class FakeSecretsManager:

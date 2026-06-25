@@ -2,15 +2,15 @@ from __future__ import annotations
 
 import pytest
 
-from contenidos_inacap.application.strategies.extraction import (
+from grading.application.strategies.extraction import (
     AudioExtractionStrategy,
     DocumentExtractionStrategy,
     VideoExtractionStrategy,
     build_extraction_registry,
     clasificacion_from_media_type,
 )
-from contenidos_inacap.domain.entities.material import MaterialType
-from contenidos_inacap.domain.enums import ClasificacionActividad
+from grading.domain.entities.material import MaterialType
+from grading.domain.enums import ClasificacionActividad
 
 
 class FakeDoc:

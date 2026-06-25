@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from contenidos_inacap.adapters.queue.sqs_queue import SqsQueue
+from grading.adapters.queue.sqs_queue import SqsQueue
 
 
 class FakeSqsClient:

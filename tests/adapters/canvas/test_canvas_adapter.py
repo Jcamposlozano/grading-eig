@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import pytest
 
-from contenidos_inacap.adapters.canvas import canvas_adapter, canvas_client
-from contenidos_inacap.ports.canvas_port import AttachmentRef
-from contenidos_inacap.ports.credentials_port import CanvasCredentials, CredentialsPort
+from grading.adapters.canvas import canvas_adapter, canvas_client
+from grading.ports.canvas_port import AttachmentRef
+from grading.ports.credentials_port import CanvasCredentials, CredentialsPort
 
 
 def test_fetch_submission_attachment_maps_and_passes_creds(monkeypatch):

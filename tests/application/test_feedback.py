@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from contenidos_inacap.application.dto.evaluation_dto import (
+from grading.application.dto.evaluation_dto import (
     CriterionEvaluationResult,
     EvaluationResponseDTO,
 )
-from contenidos_inacap.application.services.feedback import build_grade_comment
+from grading.application.services.feedback import build_grade_comment
 
 
 def test_build_grade_comment():

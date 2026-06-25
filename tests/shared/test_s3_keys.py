@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from contenidos_inacap.shared.s3_keys import (
+from grading.shared.s3_keys import (
     extracted_text_key,
     grading_key,
     metadata_key,
