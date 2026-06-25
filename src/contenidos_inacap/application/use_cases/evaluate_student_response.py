@@ -63,15 +63,10 @@ class EvaluateStudentResponseUseCase:
         )
         validated_result.prompt_used = prompt_template
 
-        if (
-            request.canvas_course_id
-            and request.canvas_assignment_id
-            and request.canvas_user_id
-        ):
+        if request.canvas_course_id and request.canvas_assignment_id and request.canvas_user_id:
             self._upload_to_canvas(request, validated_result)
 
         return validated_result
-
 
     def _normalize_and_score_result(
         self,
@@ -115,7 +110,7 @@ class EvaluateStudentResponseUseCase:
     ) -> None:
         for criterion in rubric["criteria"]:
             if criterion["id"] == criterion_id:
-                #valid_levels = {level["name"] for level in criterion["levels"]}
+                # valid_levels = {level["name"] for level in criterion["levels"]}
                 valid_levels = {level["level"] for level in criterion["levels"]}
                 if selected_level not in valid_levels:
                     raise ValueError(
@@ -159,7 +154,7 @@ class EvaluateStudentResponseUseCase:
 
         if extra:
             raise ValueError(f"Hay criterios no definidos en la rúbrica: {sorted(extra)}")
-    
+
     def _upload_to_canvas(
         self,
         request: EvaluationRequestDTO,
@@ -195,9 +190,7 @@ class EvaluateStudentResponseUseCase:
         lines.append("Detalle por criterio:")
 
         for item in result.criteria_results:
-            lines.append(
-                f"- {item.criterion_name}: {item.selected_level} ({item.score} pts)"
-            )
+            lines.append(f"- {item.criterion_name}: {item.selected_level} ({item.score} pts)")
             lines.append(f"  Justificación: {item.justification}")
 
         lines.append("")

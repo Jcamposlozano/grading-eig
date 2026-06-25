@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import List, Optional
-
 from pydantic import BaseModel, Field, model_validator
 
 
@@ -14,7 +12,7 @@ class RubricLevelDTO(BaseModel):
 class RubricCriterionDTO(BaseModel):
     id: str = Field(..., min_length=1)
     name: str = Field(..., min_length=1)
-    levels: List[RubricLevelDTO]
+    levels: list[RubricLevelDTO]
 
     @model_validator(mode="after")
     def validate_levels(self):
@@ -26,7 +24,7 @@ class RubricCriterionDTO(BaseModel):
 class RubricDTO(BaseModel):
     rubric_name: str = Field(..., min_length=1)
     max_score: int = Field(..., ge=0)
-    criteria: List[RubricCriterionDTO]
+    criteria: list[RubricCriterionDTO]
 
     @model_validator(mode="after")
     def validate_criteria(self):
@@ -43,10 +41,10 @@ class RubricDTO(BaseModel):
 class EvaluationRequestDTO(BaseModel):
     material_id: str
     rubric: RubricDTO
-    prompt_template: Optional[str] = None
-    canvas_course_id: Optional[str] = None
-    canvas_assignment_id: Optional[str] = None
-    canvas_user_id: Optional[str] = None
+    prompt_template: str | None = None
+    canvas_course_id: str | None = None
+    canvas_assignment_id: str | None = None
+    canvas_user_id: str | None = None
 
 
 class CriterionEvaluationResult(BaseModel):

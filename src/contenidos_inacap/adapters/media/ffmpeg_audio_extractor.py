@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import subprocess
@@ -44,8 +43,6 @@ class FFmpegAudioExtractor(AudioExtractorPort):
         )
 
         if result.returncode != 0:
-            raise RuntimeError(
-                f"FFmpeg falló al extraer audio. stderr={result.stderr.strip()}"
-            )
+            raise RuntimeError(f"FFmpeg falló al extraer audio. stderr={result.stderr.strip()}")
 
         return str(output_path.resolve())

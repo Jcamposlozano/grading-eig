@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import os
 
 from contenidos_inacap.domain.entities.material import MaterialStatus, MaterialType
@@ -43,9 +44,7 @@ class ExtractTextUseCase:
 
         try:
             if material.media_type == MaterialType.DOCUMENT:
-                extracted_text = self.document_extractor.extract(
-                    file_path=material.file_path
-                )
+                extracted_text = self.document_extractor.extract(file_path=material.file_path)
 
             elif material.media_type == MaterialType.AUDIO:
                 extracted_text = self.transcription_service.transcribe(
@@ -82,7 +81,5 @@ class ExtractTextUseCase:
 
         finally:
             if temp_audio_to_delete and os.path.exists(temp_audio_to_delete):
-                try:
+                with contextlib.suppress(OSError):
                     os.remove(temp_audio_to_delete)
-                except OSError:
-                    pass

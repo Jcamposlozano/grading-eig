@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
-
-
 DEFAULT_EVALUATION_PROMPT = """
 You are an academic evaluator responsible for grading student work using a predefined rubric.
 

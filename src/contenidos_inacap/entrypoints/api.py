@@ -35,7 +35,7 @@ app.add_middleware(
 app.include_router(materials_router)
 app.include_router(evaluations_router)
 
+
 @app.get("/health")
 def health():
     return {"status": "ok", "service": SERVICE_NAME}
-

@@ -1,13 +1,17 @@
 from __future__ import annotations
+
 import time
+
 from contenidos_inacap.shared.config import load_config
 from contenidos_inacap.shared.logger import get_logger
 from contenidos_inacap.shared.shutdown import ShutdownSignal
 
 log = get_logger("contenidos_inacap.worker")
 
+
 def tick() -> None:
     log.info("Worker tick ✅ (placeholder)")
+
 
 def main() -> None:
     cfg = load_config()
@@ -26,6 +30,7 @@ def main() -> None:
         elapsed = time.time() - start
         shutdown.wait(timeout=max(0.0, interval - elapsed))
     log.info("Worker detenido (shutdown).")
+
 
 if __name__ == "__main__":
     main()

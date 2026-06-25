@@ -23,9 +23,7 @@ router = APIRouter(prefix="/v1/evaluations", tags=["evaluations"])
 )
 async def evaluate_student_response(request: EvaluationRequestDTO):
     try:
-        use_case: EvaluateStudentResponseUseCase = (
-            get_evaluate_student_response_use_case()
-        )
+        use_case: EvaluateStudentResponseUseCase = get_evaluate_student_response_use_case()
         return use_case.execute(request)
 
     except MaterialForEvaluationNotFoundError as exc:

@@ -35,5 +35,3 @@ class LocalFileStorage(FileStoragePort):
         file_size = os.path.getsize(target_path)
 
         return stored_filename, str(target_path.resolve()), file_size
-
-

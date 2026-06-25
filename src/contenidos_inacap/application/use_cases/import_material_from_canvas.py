@@ -31,13 +31,9 @@ def _attachment_from_submission(
 ) -> tuple[str, dict]:
     attachments = submission.get("attachments") or []
     if not attachments:
-        raise CanvasApiError(
-            "La entrega no tiene archivos adjuntos (o el token no puede verlos)."
-        )
+        raise CanvasApiError("La entrega no tiene archivos adjuntos (o el token no puede verlos).")
     if attachment_index < 0 or attachment_index >= len(attachments):
-        raise CanvasApiError(
-            f"attachment_index fuera de rango: hay {len(attachments)} adjunto(s)."
-        )
+        raise CanvasApiError(f"attachment_index fuera de rango: hay {len(attachments)} adjunto(s).")
     att = attachments[attachment_index]
     fid = att.get("id")
     if fid is None:
@@ -66,7 +62,7 @@ class ImportMaterialFromCanvasUseCase:
             assignment_id=assignment_id,
             user_id=user_id,
         )
-        #print(submission)
+        # print(submission)
         file_id, att = _attachment_from_submission(submission, attachment_index)
         hint = att.get("display_name") or att.get("filename")
         return self.execute(

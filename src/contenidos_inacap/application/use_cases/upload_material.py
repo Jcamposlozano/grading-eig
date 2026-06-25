@@ -3,7 +3,7 @@ from __future__ import annotations
 import mimetypes
 import uuid
 from pathlib import Path
-from typing import BinaryIO, Optional
+from typing import BinaryIO, ClassVar
 
 from contenidos_inacap.domain.entities.material import Material, MaterialStatus, MaterialType
 from contenidos_inacap.ports.file_storage_port import FileStoragePort
@@ -19,9 +19,9 @@ class EmptyFileError(Exception):
 
 
 class UploadMaterialUseCase:
-    DOCUMENT_EXTENSIONS = {".txt", ".pdf", ".docx"}
-    AUDIO_EXTENSIONS = {".mp3", ".wav", ".m4a", ".ogg", ".webm"}
-    VIDEO_EXTENSIONS = {".mp4", ".mov", ".mkv", ".avi", ".webm"}
+    DOCUMENT_EXTENSIONS: ClassVar[set[str]] = {".txt", ".pdf", ".docx"}
+    AUDIO_EXTENSIONS: ClassVar[set[str]] = {".mp3", ".wav", ".m4a", ".ogg", ".webm"}
+    VIDEO_EXTENSIONS: ClassVar[set[str]] = {".mp4", ".mov", ".mkv", ".avi", ".webm"}
 
     def __init__(
         self,
@@ -36,7 +36,7 @@ class UploadMaterialUseCase:
         *,
         file_stream: BinaryIO,
         original_filename: str,
-        declared_media_type: Optional[str] = None,
+        declared_media_type: str | None = None,
     ) -> Material:
         if not original_filename:
             raise UnsupportedFileTypeError("El archivo debe tener un nombre válido.")
@@ -77,7 +77,7 @@ class UploadMaterialUseCase:
         self,
         *,
         extension: str,
-        declared_media_type: Optional[str],
+        declared_media_type: str | None,
     ) -> MaterialType:
         if declared_media_type:
             try:

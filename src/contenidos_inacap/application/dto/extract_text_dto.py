@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel
 
@@ -13,6 +12,6 @@ class ExtractTextResponse(BaseModel):
     original_filename: str
     media_type: MaterialType
     status: MaterialStatus
-    extracted_text: Optional[str]
-    error_message: Optional[str]
+    extracted_text: str | None
+    error_message: str | None
     created_at: datetime
