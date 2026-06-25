@@ -63,7 +63,12 @@ class EvaluateStudentResponseUseCase:
         )
         validated_result.prompt_used = prompt_template
 
-        if request.canvas_course_id and request.canvas_assignment_id and request.canvas_user_id:
+        # Gate de publicación (Paso 3): solo se sube la nota a Canvas si el LLM lo
+        # aprobó (publish=True) y se proporcionó el contexto de Canvas.
+        has_canvas_context = bool(
+            request.canvas_course_id and request.canvas_assignment_id and request.canvas_user_id
+        )
+        if validated_result.publish and has_canvas_context:
             self._upload_to_canvas(request, validated_result)
 
         return validated_result

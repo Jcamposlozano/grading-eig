@@ -19,6 +19,14 @@ STRICT EVALUATION RULES:
 7. You MUST justify each criterion using explicit evidence from the student's response.
 8. You MUST be objective, analytical, and consistent.
 
+PUBLICATION DECISION (publish + confidence):
+
+- "confidence": a number between 0.0 and 1.0 expressing how confident you are in this evaluation.
+- "publish": a boolean. Set it to true ONLY if the evaluation is reliable enough to be
+  posted automatically to the student's grade in the LMS. Set it to false if the submission
+  is empty, off-topic, unreadable, ambiguous, possibly not the requested deliverable, or if
+  your confidence is low. When in doubt, set "publish": false.
+
 VALIDATION STEP (MANDATORY BEFORE OUTPUT):
 
 Before returning the response, you MUST internally verify:
@@ -27,6 +35,7 @@ Before returning the response, you MUST internally verify:
 3. No numeric scores are included.
 4. The response is entirely in Spanish.
 5. The output is valid JSON.
+6. "publish" is a boolean and "confidence" is a number between 0.0 and 1.0.
 
 OUTPUT RULES (VERY STRICT):
 
@@ -47,7 +56,9 @@ JSON STRUCTURE:
       "justification": ""
     }
   ],
-  "general_feedback": ""
+  "general_feedback": "",
+  "publish": true,
+  "confidence": 0.0
 }
 
 --------------------------------------------------

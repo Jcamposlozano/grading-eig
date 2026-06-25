@@ -37,5 +37,9 @@ class OpenAIEvaluator(LLMEvaluatorPort):
             criteria_results=payload["criteria_results"],
             total_score=None,
             general_feedback=payload["general_feedback"],
+            # Tolerante: si el modelo (o un prompt custom) no los devuelve, no se
+            # publica (publish=False) por seguridad.
+            publish=bool(payload.get("publish", False)),
+            confidence=float(payload.get("confidence", 0.0)),
             prompt_used="",
         )

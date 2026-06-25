@@ -59,4 +59,8 @@ class EvaluationResponseDTO(BaseModel):
     criteria_results: list[CriterionEvaluationResult]
     total_score: int | None = None
     general_feedback: str
+    # Gate de publicación (Paso 3): el LLM decide si la nota es fiable para
+    # publicarse en Canvas. Por defecto False (no publicar ante la duda).
+    publish: bool = False
+    confidence: float = 0.0
     prompt_used: str | None = None

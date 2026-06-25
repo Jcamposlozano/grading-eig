@@ -7,6 +7,7 @@ from contenidos_inacap.adapters.media.ffmpeg_audio_extractor import FFmpegAudioE
 from contenidos_inacap.adapters.repositories.in_memory_material_repository import (
     InMemoryMaterialRepository,
 )
+from contenidos_inacap.adapters.rubric.s3_rubric_store import S3RubricStore
 from contenidos_inacap.adapters.storage.local_file_storage import LocalFileStorage
 from contenidos_inacap.adapters.storage.local_object_storage import LocalObjectStorage
 from contenidos_inacap.adapters.transcription.openai_transcriber import OpenAITranscriber
@@ -19,6 +20,7 @@ from contenidos_inacap.application.use_cases.import_material_from_canvas import 
 )
 from contenidos_inacap.application.use_cases.upload_material import UploadMaterialUseCase
 from contenidos_inacap.ports.credentials_port import CredentialsPort
+from contenidos_inacap.ports.rubric_port import RubricPort
 from contenidos_inacap.ports.storage_port import StoragePort
 from contenidos_inacap.shared.config import load_config
 
@@ -45,6 +47,11 @@ def _build_object_storage() -> StoragePort:
 
 
 _object_storage = _build_object_storage()
+_rubric_store = S3RubricStore(storage=_object_storage)
+
+
+def get_rubric_store() -> RubricPort:
+    return _rubric_store
 
 
 def _build_credentials() -> CredentialsPort:
