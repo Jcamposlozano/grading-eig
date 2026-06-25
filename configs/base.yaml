@@ -10,3 +10,13 @@ service:
 worker:
   enabled: true
   interval_seconds: 10
+
+storage:
+  backend: local            # local | s3
+  local_base_dir: data/objects
+  s3_bucket: prisma-calificacion-canvas
+  region: us-east-2
+
+credentials:
+  backend: env              # env | secrets_manager
+  secret_prefix: prisma/grading

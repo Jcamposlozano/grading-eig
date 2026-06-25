@@ -6,6 +6,10 @@ import urllib.parse
 import urllib.request
 from typing import Any
 
+from contenidos_inacap.shared.logger import get_logger
+
+log = get_logger("contenidos_inacap.canvas")
+
 
 class CanvasApiError(Exception):
     """Error al llamar a la API de Canvas."""
@@ -55,9 +59,7 @@ def _get(url: str, token: str, *, timeout: float = 120.0) -> tuple[bytes, int]:
                 "(no 'self'). Detalle Canvas: "
                 f"{body[:400]}"
             ) from e
-        raise CanvasApiError(
-            f"Canvas respondió {e.code} para {url}: {body[:500]}"
-        ) from e
+        raise CanvasApiError(f"Canvas respondió {e.code} para {url}: {body[:500]}") from e
     except urllib.error.URLError as e:
         raise CanvasApiError(f"No se pudo conectar a Canvas: {e}") from e
 
@@ -96,9 +98,7 @@ def fetch_assignment_submission(
     try:
         target_uid = int(resolved_uid)
     except ValueError as exc:
-        raise CanvasApiError(
-            "user_id debe ser numérico o la cadena 'self'."
-        ) from exc
+        raise CanvasApiError("user_id debe ser numérico o la cadena 'self'.") from exc
 
     base = base_url.rstrip("/")
     cid = urllib.parse.quote(course_id, safe="")
@@ -119,9 +119,7 @@ def fetch_assignment_submission(
         parsed: Any = json.loads(raw.decode("utf-8"))
         batch = _normalize_submissions_batch(parsed)
         if not batch and not isinstance(parsed, (list, dict)):
-            raise CanvasApiError(
-                "Canvas devolvió un formato inesperado al listar entregas."
-            )
+            raise CanvasApiError("Canvas devolvió un formato inesperado al listar entregas.")
         for sub in batch:
             if _user_ids_equal(sub.get("user_id"), target_uid):
                 return sub
@@ -191,10 +189,7 @@ def download_file_bytes(
         if data and not _looks_like_html(data):
             return data
 
-    url = (
-        f"{base}/api/v1/files/"
-        f"{urllib.parse.quote(file_id, safe='')}/download?download_frd=1"
-    )
+    url = f"{base}/api/v1/files/{urllib.parse.quote(file_id, safe='')}/download?download_frd=1"
     try:
         data, _ = _get(url, token, timeout=120.0)
     except CanvasApiError as exc:
@@ -210,7 +205,9 @@ def download_file_bytes(
     return data
 
 
-def _put(url: str, token: str, data: dict[str, Any], *, timeout: float = 120.0) -> tuple[bytes, int]:
+def _put(
+    url: str, token: str, data: dict[str, Any], *, timeout: float = 120.0
+) -> tuple[bytes, int]:
     """Send PUT request to Canvas API."""
     req = urllib.request.Request(
         url,
@@ -226,14 +223,14 @@ def _put(url: str, token: str, data: dict[str, Any], *, timeout: float = 120.0) 
             return resp.read(), resp.getcode() or 200
     except urllib.error.HTTPError as e:
         body = e.read().decode("utf-8", errors="replace")
-        raise CanvasApiError(
-            f"Canvas respondió {e.code} para {url}: {body[:500]}"
-        ) from e
+        raise CanvasApiError(f"Canvas respondió {e.code} para {url}: {body[:500]}") from e
     except urllib.error.URLError as e:
         raise CanvasApiError(f"No se pudo conectar a Canvas: {e}") from e
 
 
-def _post(url: str, token: str, data: dict[str, Any], *, timeout: float = 120.0) -> tuple[bytes, int]:
+def _post(
+    url: str, token: str, data: dict[str, Any], *, timeout: float = 120.0
+) -> tuple[bytes, int]:
     """Send POST request to Canvas API."""
     req = urllib.request.Request(
         url,
@@ -249,9 +246,7 @@ def _post(url: str, token: str, data: dict[str, Any], *, timeout: float = 120.0)
             return resp.read(), resp.getcode() or 200
     except urllib.error.HTTPError as e:
         body = e.read().decode("utf-8", errors="replace")
-        raise CanvasApiError(
-            f"Canvas respondió {e.code} para {url}: {body[:500]}"
-        ) from e
+        raise CanvasApiError(f"Canvas respondió {e.code} para {url}: {body[:500]}") from e
     except urllib.error.URLError as e:
         raise CanvasApiError(f"No se pudo conectar a Canvas: {e}") from e
 
@@ -273,25 +268,21 @@ def update_submission_grade(
         f"{urllib.parse.quote(assignment_id, safe='')}/submissions/"
         f"{urllib.parse.quote(user_id, safe='')}"
     )
-    
+
     # First update the grade
-    grade_data = {
-        "submission": {
-            "posted_grade": str(score)
-        }
-    }
-    
-    print(f"Enviando calificación a Canvas URL: {url}")
-    print(f"Datos de calificación: {json.dumps(grade_data, indent=2)}")
-    
+    grade_data = {"submission": {"posted_grade": str(score)}}
+
+    log.info("Enviando calificación a Canvas: %s", url)
+    log.debug("Datos de calificación: %s", json.dumps(grade_data))
+
     try:
         raw, status_code = _put(url, token, grade_data, timeout=120.0)
         response_data = json.loads(raw.decode("utf-8"))
-        print(f"Respuesta calificación Canvas (status {status_code}): {json.dumps(response_data, indent=2)}")
+        log.debug("Respuesta calificación Canvas (status %s)", status_code)
     except Exception as e:
-        print(f"Error en calificación a Canvas: {e}")
+        log.error("Error en calificación a Canvas: %s", e)
         raise
-    
+
     # Then add the comment separately
     comment_url = (
         f"{base_url.rstrip('/')}/api/v1/courses/"
@@ -299,24 +290,20 @@ def update_submission_grade(
         f"{urllib.parse.quote(assignment_id, safe='')}/submissions/"
         f"{urllib.parse.quote(user_id, safe='')}"
     )
-    
-    comment_data = {
-        "comment": {
-            "text_comment": comment
-        }
-    }
-    
-    print(f"Enviando comentario a Canvas URL: {comment_url}")
-    print(f"Datos de comentario: {json.dumps(comment_data, indent=2)}")
-    
+
+    comment_data = {"comment": {"text_comment": comment}}
+
+    log.info("Enviando comentario a Canvas: %s", comment_url)
+    log.debug("Datos de comentario: %s", json.dumps(comment_data))
+
     try:
         raw, status_code = _put(comment_url, token, comment_data, timeout=120.0)
-        comment_response = json.loads(raw.decode("utf-8"))
-        print(f"Respuesta comentario Canvas (status {status_code}): {json.dumps(comment_response, indent=2)}")
+        json.loads(raw.decode("utf-8"))
+        log.debug("Respuesta comentario Canvas (status %s)", status_code)
     except Exception as e:
-        print(f"Error en comentario a Canvas: {e}")
+        log.warning("Error en comentario a Canvas (la nota ya se actualizó): %s", e)
         # Don't raise here, grade was already updated
-    
+
     return response_data
 
 
