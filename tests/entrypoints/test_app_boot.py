@@ -44,3 +44,28 @@ def test_post_calificaciones_on_real_app():
 
     assert response.status_code == 202
     assert response.json()["status"] == "accepted"
+
+
+def test_v1_routes_marked_deprecated_in_openapi():
+    paths = app.openapi()["paths"]
+
+    # rutas v1 (materials, evaluations): deprecadas
+    assert paths["/v1/evaluations"]["post"]["deprecated"] is True
+    assert paths["/v1/materials"]["post"]["deprecated"] is True
+
+    # el flujo nuevo NO está deprecado
+    assert paths["/v1/calificaciones"]["post"].get("deprecated", False) is False
+
+
+def test_deprecation_header_on_v1_even_on_error():
+    client = TestClient(app)
+
+    # body inválido -> 422, pero el header de deprecación debe estar igual
+    response = client.post("/v1/evaluations", json={})
+    assert response.status_code == 422
+    assert response.headers.get("Deprecation") == "true"
+    assert "/v1/calificaciones" in response.headers.get("Link", "")
+
+    # las rutas no-deprecadas no llevan el header
+    assert client.get("/health").headers.get("Deprecation") is None
+    assert client.post("/v1/calificaciones", json={}).headers.get("Deprecation") is None

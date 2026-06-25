@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
+from grading.entrypoints.deprecation import is_deprecated_path, mark_response_deprecated
 from grading.entrypoints.routers.calificaciones_router import (
     router as calificaciones_router,
 )
@@ -34,9 +35,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+@app.middleware("http")
+async def add_deprecation_headers(request: Request, call_next):
+    """Header Deprecation/Link en TODAS las respuestas de rutas v1 (incl. errores)."""
+    response = await call_next(request)
+    if is_deprecated_path(request.url.path):
+        mark_response_deprecated(response)
+    return response
+
+
 # routers
-app.include_router(materials_router)
-app.include_router(evaluations_router)
+# v1 (materials, evaluations): DEPRECADAS — siguen funcionando, pero el flujo nuevo
+# es POST /v1/calificaciones (orquestador). Se marcan en OpenAPI (deprecated=True) y
+# con header Deprecation/Link en runtime. No se eliminan por ahora.
+app.include_router(materials_router, deprecated=True)
+app.include_router(evaluations_router, deprecated=True)
 app.include_router(calificaciones_router)
 
 
