@@ -13,6 +13,8 @@ from contenidos_inacap.adapters.storage.local_object_storage import LocalObjectS
 from contenidos_inacap.entrypoints.routers import calificaciones_router as mod
 from contenidos_inacap.shared import s3_keys
 
+_ALL_UNIS = ["westfield", "eig", "esic", "uide"]
+
 
 def _valid_payload() -> dict:
     return {
@@ -26,10 +28,13 @@ def _valid_payload() -> dict:
     }
 
 
-def _app() -> FastAPI:
+def _client(*, allowed=_ALL_UNIS):
     app = FastAPI()
     app.include_router(mod.router)
-    return app
+    queue = InMemoryQueue()
+    app.dependency_overrides[mod.get_queue_dep] = lambda: queue
+    app.dependency_overrides[mod.get_allowed_universidades_dep] = lambda: list(allowed)
+    return TestClient(app), queue
 
 
 def test_build_idempotency_key_deterministic_and_sensitive():
@@ -41,10 +46,7 @@ def test_build_idempotency_key_deterministic_and_sensitive():
 
 
 def test_post_enqueues_and_returns_202():
-    queue = InMemoryQueue()
-    app = _app()
-    app.dependency_overrides[mod.get_queue_dep] = lambda: queue
-    client = TestClient(app)
+    client, queue = _client()
 
     response = client.post("/v1/calificaciones", json=_valid_payload())
 
@@ -59,18 +61,36 @@ def test_post_enqueues_and_returns_202():
 
 
 def test_post_rejects_bad_env():
-    app = _app()
-    app.dependency_overrides[mod.get_queue_dep] = lambda: InMemoryQueue()
-    client = TestClient(app)
+    client, _ = _client()
 
     response = client.post("/v1/calificaciones", json={**_valid_payload(), "env": "banana"})
 
     assert response.status_code == 422
 
 
+def test_post_rejects_universidad_not_allowed():
+    client, queue = _client(allowed=["esic", "uide"])  # eig NO está habilitada
+
+    response = client.post("/v1/calificaciones", json=_valid_payload())
+
+    assert response.status_code == 400
+    assert "no habilitada" in response.json()["detail"]
+    assert queue.consume(max_messages=1) == []  # no se encoló
+
+
+def test_post_accepts_allowed_universidad_after_normalizacion():
+    client, queue = _client(allowed=["eig"])
+
+    response = client.post("/v1/calificaciones", json={**_valid_payload(), "id_universidad": "EIG"})
+
+    assert response.status_code == 202
+    assert queue.consume(max_messages=1)[0].body["id_universidad"] == "eig"
+
+
 def test_get_calificacion_404_then_200(tmp_path):
     storage = LocalObjectStorage(base_dir=str(tmp_path))
-    app = _app()
+    app = FastAPI()
+    app.include_router(mod.router)
     app.dependency_overrides[mod.get_storage_dep] = lambda: storage
     client = TestClient(app)
 

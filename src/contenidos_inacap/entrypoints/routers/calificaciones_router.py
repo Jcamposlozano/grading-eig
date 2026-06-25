@@ -45,6 +45,12 @@ def get_rubric_dep() -> RubricPort:
     return get_rubric_store()
 
 
+def get_allowed_universidades_dep() -> list[str]:
+    from contenidos_inacap.shared.container import get_allowed_universidades
+
+    return get_allowed_universidades()
+
+
 def build_idempotency_key(payload: dict) -> str:
     raw = "|".join(str(payload[field]) for field in _IDEMPOTENCY_FIELDS)
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
@@ -58,7 +64,14 @@ def build_idempotency_key(payload: dict) -> str:
 def crear_calificacion(
     body: CalificacionRequestDTO,
     queue: QueuePort = Depends(get_queue_dep),
+    universidades: list[str] = Depends(get_allowed_universidades_dep),
 ) -> CalificacionAcceptedDTO:
+    if body.id_universidad not in universidades:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Universidad '{body.id_universidad}' no habilitada. Permitidas: {universidades}",
+        )
+
     payload = body.model_dump()
     idempotency_key = build_idempotency_key(payload)
     payload["idempotency_key"] = idempotency_key

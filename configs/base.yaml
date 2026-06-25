@@ -25,3 +25,7 @@ queue:
   backend: memory           # memory | sqs
   wait_seconds: 20
   max_messages: 5
+
+universidades:
+  # Allowlist de tenants habilitados. Se puede acotar por entorno en {env}.yaml.
+  permitidas: [westfield, eig, esic, uide]

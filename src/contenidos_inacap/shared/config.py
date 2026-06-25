@@ -50,6 +50,7 @@ def load_config(config_dir: str = "configs") -> dict[str, Any]:
     cfg.setdefault("storage", {})
     cfg.setdefault("credentials", {})
     cfg.setdefault("queue", {})
+    cfg.setdefault("universidades", {})
 
     cfg["project"]["env"] = os.getenv("ENV", cfg["project"].get("env", "dev"))
     cfg["project"]["log_level"] = os.getenv("LOG_LEVEL", cfg["project"].get("log_level", "INFO"))
@@ -84,5 +85,15 @@ def load_config(config_dir: str = "configs") -> dict[str, Any]:
     cfg["queue"]["max_messages"] = int(
         os.getenv("QUEUE_MAX_MESSAGES", cfg["queue"].get("max_messages", 5))
     )
+
+    # Allowlist de universidades habilitadas (por entorno vía {env}.yaml, o
+    # override por env var UNIVERSIDADES_PERMITIDAS=westfield,eig,...). Normalizada
+    # a slugs en minúscula. Agregar una universidad = solo config.
+    permitidas_env = os.getenv("UNIVERSIDADES_PERMITIDAS")
+    if permitidas_env is not None:
+        permitidas = [u.strip().lower() for u in permitidas_env.split(",") if u.strip()]
+    else:
+        permitidas = [str(u).strip().lower() for u in cfg["universidades"].get("permitidas", [])]
+    cfg["universidades"]["permitidas"] = permitidas
 
     return cfg

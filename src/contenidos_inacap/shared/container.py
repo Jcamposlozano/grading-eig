@@ -120,6 +120,10 @@ def get_object_storage() -> StoragePort:
     return _object_storage
 
 
+def get_allowed_universidades() -> list[str]:
+    return list(_config.get("universidades", {}).get("permitidas", []))
+
+
 def get_upload_material_use_case() -> UploadMaterialUseCase:
     return UploadMaterialUseCase(
         material_repository=_material_repository,
