@@ -291,7 +291,7 @@ Reutiliza los adaptadores actuales (`DocumentTextExtractor`, `FFmpegAudioExtract
 2. **SQS:** ¿`standard` (throughput) o `FIFO` (orden + dedup nativo)?
 3. **¿BD?** ¿Los listados/consultas justifican DynamoDB, o S3-by-prefix basta esta fase?
 4. **Migración bucket:** ¿qué objetos exactos de `eig-chatbot-logs-prod` migramos? (necesito ver su estructura).
-5. **`confidence`:** ¿hay umbral mínimo además del `publish` del LLM, o `publish` manda solo?
+5. ~~**`confidence`:** ¿hay umbral mínimo además del `publish` del LLM?~~ **RESUELTO:** `publish=true` → publica siempre; **sin umbral** de `confidence` (se guarda solo como metadato).
 6. **Renombrar paquete** `contenidos_inacap` → `grading`: ¿OK, o conservar el nombre?
 7. **Rotación de secretos:** ¿automática (Secrets Manager) o manual?
 8. **Límite de video:** ¿tamaño/duración máximos a soportar (afecta timeouts/costos)?
@@ -307,8 +307,8 @@ Cada paso es **enviable y testeable** por separado; convive con lo viejo detrás
 - [x] **Paso 1 — S3.** `StoragePort` + `S3Storage` (boto3) + `LocalObjectStorage` (dev/tests); config `storage.backend` (local|s3) + factory `get_object_storage()`; convive con `LocalFileStorage`. Tests verdes.
 - [x] **Paso 2 — Secrets + Canvas multi-tenant.** `CredentialsPort` (+ `CanvasCredentials`/`CredentialsResolutionError`) con `EnvCredentials` (fallback) y `SecretsManagerCredentials` (secreto `prisma/grading/{env}/canvas/{uni}`, cache TTL, alias de claves); `CanvasPort` + `CanvasAdapter` (delega en `canvas_client`, creds por instancia) + `CanvasAdapterFactory`; `print`→logger en `canvas_client`; config `credentials.backend` (env|secrets_manager) + factories en el container. 21 tests verdes.
 - [x] **Paso 3 — Rúbrica + gate.** `RubricPort` + `S3RubricStore` (lee `rubrica.json` por jerarquía vía `StoragePort`) + `shared/s3_keys.rubrica_key`; `EvaluationResponseDTO` extendido con `publish`/`confidence` (prompt + `OpenAIEvaluator` tolerantes); gate aplicado en `evaluate_student_response` (publica en Canvas **solo si `publish=True`** y hay contexto Canvas). 26 tests verdes. *(Pendiente pregunta abierta #5: ¿umbral de `confidence`?)*
-- [ ] **Paso 4 — Registry de extracción.** Reemplazar el `if/elif` de `extract_text.py` por estrategias por clasificación.
-- [ ] **Paso 5 — Dominio.** Entidades `Universidad..Calificacion` + enums; mapear `Material`.
+- [x] **Paso 4 — Registry de extracción.** `application/strategies/extraction.py`: `ExtractionStrategy` + `DocumentExtractionStrategy`/`AudioExtractionStrategy`/`VideoExtractionStrategy` + `build_extraction_registry`. `ExtractTextUseCase` ya no usa `if/elif`: mapea `media_type`→`ClasificacionActividad` y resuelve la estrategia. El video limpia su audio temporal dentro de la estrategia.
+- [x] **Paso 5 — Dominio.** `domain/enums.py` (`ClasificacionActividad`, `EstadoEntregable`) + entidades `Universidad/Curso/Estudiante/Actividad/Entregable/Rubrica/Calificacion` (dataclasses framework-free). `Entregable` generaliza `Material`; `clasificacion_from_media_type` mapea ambos. Mapeo DTO↔dominio para Rúbrica/Calificación se hará en el Paso 7. 37 tests verdes.
 - [ ] **Paso 6 — Cola + Worker real.** `QueuePort` + `SqsQueue`; worker pasa de placeholder a consumidor SQS (con `extend_visibility` + DLQ).
 - [ ] **Paso 7 — Orquestador + endpoint.** `CalificarEntregable` + `POST /v1/calificaciones` (202) + endpoints de lectura.
 - [ ] **Paso 8 — Migración bucket.** Script idempotente `eig-chatbot-logs-prod` → `prisma-calificacion-canvas`.

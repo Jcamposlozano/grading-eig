@@ -11,6 +11,7 @@ from contenidos_inacap.adapters.rubric.s3_rubric_store import S3RubricStore
 from contenidos_inacap.adapters.storage.local_file_storage import LocalFileStorage
 from contenidos_inacap.adapters.storage.local_object_storage import LocalObjectStorage
 from contenidos_inacap.adapters.transcription.openai_transcriber import OpenAITranscriber
+from contenidos_inacap.application.strategies.extraction import build_extraction_registry
 from contenidos_inacap.application.use_cases.evaluate_student_response import (
     EvaluateStudentResponseUseCase,
 )
@@ -104,11 +105,14 @@ def get_import_material_from_canvas_use_case() -> ImportMaterialFromCanvasUseCas
 
 def get_extract_text_use_case() -> ExtractTextUseCase:
     transcriber = OpenAITranscriber()
+    registry = build_extraction_registry(
+        document_extractor=_document_extractor,
+        transcriber=transcriber,
+        audio_extractor=_audio_extractor,
+    )
     return ExtractTextUseCase(
         material_repository=_material_repository,
-        transcription_service=transcriber,
-        audio_extractor=_audio_extractor,
-        document_extractor=_document_extractor,
+        extraction_registry=registry,
     )
 
 
