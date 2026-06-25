@@ -3,6 +3,9 @@ from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from contenidos_inacap.entrypoints.routers.calificaciones_router import (
+    router as calificaciones_router,
+)
 from contenidos_inacap.entrypoints.routers.evaluations_router import (
     router as evaluations_router,
 )
@@ -34,8 +37,14 @@ app.add_middleware(
 # routers
 app.include_router(materials_router)
 app.include_router(evaluations_router)
+app.include_router(calificaciones_router)
 
 
 @app.get("/health")
 def health():
     return {"status": "ok", "service": SERVICE_NAME}
+
+
+@app.get("/health/ready")
+def ready():
+    return {"status": "ready", "service": SERVICE_NAME}

@@ -11,7 +11,12 @@ from contenidos_inacap.adapters.rubric.s3_rubric_store import S3RubricStore
 from contenidos_inacap.adapters.storage.local_file_storage import LocalFileStorage
 from contenidos_inacap.adapters.storage.local_object_storage import LocalObjectStorage
 from contenidos_inacap.adapters.transcription.openai_transcriber import OpenAITranscriber
+from contenidos_inacap.application.services.rubric_grader import RubricGrader
 from contenidos_inacap.application.strategies.extraction import build_extraction_registry
+from contenidos_inacap.application.use_cases.calificar_entregable import (
+    CalificarEntregable,
+    CalificarEntregableCommand,
+)
 from contenidos_inacap.application.use_cases.evaluate_student_response import (
     EvaluateStudentResponseUseCase,
 )
@@ -147,3 +152,38 @@ def get_evaluate_student_response_use_case() -> EvaluateStudentResponseUseCase:
         llm_evaluator=evaluator,
         material_repository=_material_repository,
     )
+
+
+def get_calificar_entregable_use_case() -> CalificarEntregable:
+    transcriber = OpenAITranscriber()
+    registry = build_extraction_registry(
+        document_extractor=_document_extractor,
+        transcriber=transcriber,
+        audio_extractor=_audio_extractor,
+    )
+    return CalificarEntregable(
+        canvas_factory=_canvas_adapter_factory,
+        storage=_object_storage,
+        rubric_store=_rubric_store,
+        extraction_registry=registry,
+        grader=RubricGrader(OpenAIEvaluator()),
+    )
+
+
+def get_message_handler():
+    """Handler que el worker invoca por cada mensaje de la cola."""
+    use_case = get_calificar_entregable_use_case()
+
+    def handle(body: dict) -> None:
+        command = CalificarEntregableCommand(
+            id_universidad=body["id_universidad"],
+            id_curso=body["id_curso"],
+            id_actividad=body["id_actividad"],
+            id_entregable=body["id_entregable"],
+            id_estudiante=body["id_estudiante"],
+            id_rubrica=body["id_rubrica"],
+            env=body["env"],
+        )
+        use_case.execute(command)
+
+    return handle

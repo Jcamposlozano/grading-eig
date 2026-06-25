@@ -3,9 +3,10 @@ from __future__ import annotations
 import mimetypes
 import uuid
 from pathlib import Path
-from typing import BinaryIO, ClassVar
+from typing import BinaryIO
 
 from contenidos_inacap.domain.entities.material import Material, MaterialStatus, MaterialType
+from contenidos_inacap.domain.media_type import media_type_from_filename, supported_extensions
 from contenidos_inacap.ports.file_storage_port import FileStoragePort
 from contenidos_inacap.ports.material_repository_port import MaterialRepositoryPort
 
@@ -19,10 +20,6 @@ class EmptyFileError(Exception):
 
 
 class UploadMaterialUseCase:
-    DOCUMENT_EXTENSIONS: ClassVar[set[str]] = {".txt", ".pdf", ".docx"}
-    AUDIO_EXTENSIONS: ClassVar[set[str]] = {".mp3", ".wav", ".m4a", ".ogg", ".webm"}
-    VIDEO_EXTENSIONS: ClassVar[set[str]] = {".mp4", ".mov", ".mkv", ".avi", ".webm"}
-
     def __init__(
         self,
         material_repository: MaterialRepositoryPort,
@@ -41,10 +38,8 @@ class UploadMaterialUseCase:
         if not original_filename:
             raise UnsupportedFileTypeError("El archivo debe tener un nombre válido.")
 
-        extension = Path(original_filename).suffix.lower()
-
         media_type = self._resolve_media_type(
-            extension=extension,
+            original_filename=original_filename,
             declared_media_type=declared_media_type,
         )
 
@@ -76,7 +71,7 @@ class UploadMaterialUseCase:
     def _resolve_media_type(
         self,
         *,
-        extension: str,
+        original_filename: str,
         declared_media_type: str | None,
     ) -> MaterialType:
         if declared_media_type:
@@ -87,14 +82,10 @@ class UploadMaterialUseCase:
                     f"Tipo declarado no soportado: {declared_media_type}"
                 ) from exc
 
-        if extension in self.DOCUMENT_EXTENSIONS:
-            return MaterialType.DOCUMENT
-        if extension in self.AUDIO_EXTENSIONS:
-            return MaterialType.AUDIO
-        if extension in self.VIDEO_EXTENSIONS:
-            return MaterialType.VIDEO
-
-        raise UnsupportedFileTypeError(
-            f"No se soporta la extensión '{extension}'. "
-            f"Permitidos: {sorted(self.DOCUMENT_EXTENSIONS | self.AUDIO_EXTENSIONS | self.VIDEO_EXTENSIONS)}"
-        )
+        media_type = media_type_from_filename(original_filename)
+        if media_type is None:
+            extension = Path(original_filename).suffix.lower()
+            raise UnsupportedFileTypeError(
+                f"No se soporta la extensión '{extension}'. Permitidos: {supported_extensions()}"
+            )
+        return media_type
