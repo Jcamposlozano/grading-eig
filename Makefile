@@ -1,6 +1,6 @@
 SHELL := /bin/bash
-PROJECT := contenidos-inacap
-PKG := contenidos_inacap
+PROJECT := grading
+PKG := grading
 
 .PHONY: install run-api run-worker format lint precommit docker-up docker-down docker-logs docker-build
 
