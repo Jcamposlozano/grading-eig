@@ -1,10 +1,10 @@
 services:
   api:
     build: .
-    container_name: contenidos-inacap_api
+    container_name: grading_api
     env_file: [.env]
     ports: ["8000:8000"]
-    command: ["python", "-m", "contenidos_inacap.main_api"]
+    command: ["python", "-m", "grading.main_api"]
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://localhost:8000/health"]
       interval: 10s
@@ -14,9 +14,9 @@ services:
 
   worker:
     build: .
-    container_name: contenidos-inacap_worker
+    container_name: grading_worker
     env_file: [.env]
-    command: ["python", "-m", "contenidos_inacap.main_worker"]
+    command: ["python", "-m", "grading.main_worker"]
     depends_on:
       api:
         condition: service_healthy

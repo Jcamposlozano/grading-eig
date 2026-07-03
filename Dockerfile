@@ -20,4 +20,4 @@ COPY . /app
 RUN poetry config virtualenvs.create false \
     && poetry install --no-interaction --no-ansi --only main
 
-CMD ["python", "-m", "contenidos_inacap.main_api"]
+CMD ["python", "-m", "grading.main_api"]

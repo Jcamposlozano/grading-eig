@@ -3,3 +3,9 @@ project:
   log_level: INFO
 worker:
   interval_seconds: 30
+storage:
+  backend: s3
+credentials:
+  backend: secrets_manager
+queue:
+  backend: sqs

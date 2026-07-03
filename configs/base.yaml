@@ -1,5 +1,5 @@
 project:
-  name: contenidos-inacap
+  name: grading
   env: dev
   log_level: INFO
 
@@ -10,3 +10,22 @@ service:
 worker:
   enabled: true
   interval_seconds: 10
+
+storage:
+  backend: local            # local | s3
+  local_base_dir: data/objects
+  s3_bucket: prisma-calificacion-canvas
+  region: us-east-2
+
+credentials:
+  backend: env              # env | secrets_manager
+  secret_prefix: prisma/grading
+
+queue:
+  backend: memory           # memory | sqs
+  wait_seconds: 20
+  max_messages: 5
+
+universidades:
+  # Allowlist de tenants habilitados. Se puede acotar por entorno en {env}.yaml.
+  permitidas: [westfield, eig, esic, uide]
